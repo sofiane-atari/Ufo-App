@@ -1,6 +1,9 @@
+"use dom"
+
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Dimensions, Modal, TouchableOpacity } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import "leaflet/dist/leaflet.css"
+import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet';
+import L from "leaflet";
 import axios from 'axios';
 
 interface UfoSighting {
@@ -15,48 +18,25 @@ interface UfoSighting {
   dateTime: string;
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  map: {
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  closeButton: {
-    marginTop: 10,
-    textAlign: 'right',
-    color: '#007BFF',
-    backgroundColor: '#ff6347',
-    height: 40,
-    width: 65,
-    padding: 10,
-    borderRadius: 20
-  },
+const iconX = L.icon({
+  iconUrl: 'https://raw.githubusercontent.com/similonap/public_icons/refs/heads/main/location-pin.png',
+  iconSize: [48, 48],
+  popupAnchor: [-3, 0],
 });
+
+const LocationHandler = ({ addMarker }: { addMarker: (lat: number, lng: number) => void }) => {
+  const map = useMapEvents({
+    click: (e) => {
+      addMarker(e.latlng.lat, e.latlng.lng);
+    }
+  });
+  return null;
+};
 
 export default function Index() {
   const [sightings, setSightings] = useState<UfoSighting[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedSighting, setSelectedSighting] = useState<UfoSighting | null>(null);
 
   const fetchSightings = async () => {
     try {
@@ -76,45 +56,51 @@ export default function Index() {
   }, []);
 
   if (loading) {
-    return <Text>Bezig met laden...</Text>;
+    return <div>Bezig met laden...</div>;
   }
 
   if (error) {
-    return <Text>{error}</Text>;
+    return <div>{error}</div>;
   }
 
-  return (
-    <View style={styles.container}>
-      <MapView style={styles.map}>
-        {sightings.map((sighting) => (
-          <Marker
-            key={sighting.id}
-            coordinate={sighting.location}
-            title={`Getuige: ${sighting.witnessName}`}
-            description={sighting.description}
-            onPress={() => setSelectedSighting(sighting)} // Open modal bij klik
-          />
-        ))}
-      </MapView>
+  const addSighting = (lat: number, lng: number) => {
+    setSightings([
+      ...sightings,
+      {
+        id: Math.random(),
+        witnessName: "Gebruiker",
+        description: "Kies maar",
+        location: { latitude: lat, longitude: lng },
+        status: "unconfirmed",
+        dateTime: "1/11/2011"
+      }
+    ]);
+  };
 
-      {/* Modal voor details */}
-      <Modal visible={!!selectedSighting} animationType="slide" transparent={true}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Details:</Text>
-            <Text>Getuige: {selectedSighting?.witnessName}</Text>
-            <Text>Beschrijving: {selectedSighting?.description}</Text>
-            <Text>Status: {selectedSighting?.status}</Text>
-            <Text>Datum: {selectedSighting?.dateTime}</Text>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setSelectedSighting(null)} // Sluit modal
-            >
-              <Text>Sluiten</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    </View>
+  return (
+    <MapContainer
+      center={{ lat: 51.505, lng: -0.09 }}
+      zoom={13}
+      scrollWheelZoom={false}
+      style={{ width: '100%', height: '100vh' }}
+    >
+      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      <LocationHandler addMarker={addSighting} />
+      {sightings.map((sighting, index) => (
+        <Marker
+          key={index}
+          position={[sighting.location.latitude, sighting.location.longitude]}
+          icon={iconX}
+        >
+          <Popup>
+            <div>
+              <p>{sighting.witnessName}</p>
+              <p>{sighting.description}</p>
+              <p>{sighting.dateTime}</p>
+            </div>
+          </Popup>
+        </Marker>
+      ))}
+    </MapContainer>
   );
 }
