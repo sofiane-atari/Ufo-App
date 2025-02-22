@@ -130,7 +130,7 @@ export default function Index() {
     <View style={styles.container}>
       {/* Kaart */}
       <MapContainer
-        center={{ lat: 51.505, lng: -0.09 }}
+        center={{ lat: 51.21989, lng: 4.40346 }}
         zoom={13}
         scrollWheelZoom={false}
         style={styles.map}
@@ -183,7 +183,7 @@ export default function Index() {
           style={styles.input}
         />
 
-        <Button title="Sighting toevoegen" onPress={handleAddSighting} />
+        <Button title="Sighting toevoegen" onPress={handleAddSighting}/>
       </View>
     </View>
   );
@@ -236,5 +236,9 @@ const styles = StyleSheet.create({
     height: 80,
     textAlignVertical: 'top',
     marginBottom: 10,
+  },
+  button: {
+    backgroundColor: '#ff6347',
+    color: 'black'
   },
 });
