@@ -6,6 +6,8 @@ import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaf
 import L from "leaflet";
 import axios from 'axios';
 import { View, StyleSheet, Text, TextInput, Button } from 'react-native';
+import { WebView } from 'react-native-webview';
+
 
 interface UfoSighting {
   id: number;
@@ -192,8 +194,11 @@ export default function Index() {
 // Stijlen
 const styles = StyleSheet.create({
   container: {
-    position: 'relative',
-    flex: 1,
+    position: 'absolute',
+    left: 0,
+    top:0,
+    bottom:0,
+    right:0,
   },
   map: {
     flex: 1,
