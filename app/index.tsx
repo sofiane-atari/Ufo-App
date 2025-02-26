@@ -5,8 +5,8 @@ import "leaflet/dist/leaflet.css"
 import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet';
 import L from "leaflet";
 import axios from 'axios';
-import { View, StyleSheet, Text, TextInput, Button } from 'react-native';
-import { WebView } from 'react-native-webview';
+import { View, StyleSheet, Text, TextInput, Button, TouchableOpacity } from 'react-native';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 
 interface UfoSighting {
@@ -63,7 +63,7 @@ export default function Index() {
   const [sightings, setSightings] = useState<UfoSighting[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [isFormVisible, setIsFormVisible] = useState(false);
   // Formulierstatus
   const [formData, setFormData] = useState<FormData>({
     witnessName: '',
@@ -162,6 +162,15 @@ export default function Index() {
       </MapContainer>
 
       {/* Formulier */}
+      <TouchableOpacity 
+      style={styles.toggleButton} 
+      onPress={() => setIsFormVisible(!isFormVisible)}
+    >
+      {isFormVisible ? <ChevronLeft size={25} /> : <ChevronRight size={25} />}
+    </TouchableOpacity>
+
+    {/* Formulier */}
+    {isFormVisible && (
       <View style={styles.formContainer}>
         <Text style={styles.label}>Getuige naam:</Text>
         <TextInput
@@ -169,7 +178,6 @@ export default function Index() {
           onChangeText={(text) => setFormData({ ...formData, witnessName: text })}
           style={styles.input}
         />
-
         <Text style={styles.label}>Beschrijving:</Text>
         <TextInput
           value={formData.description}
@@ -177,16 +185,15 @@ export default function Index() {
           multiline
           style={styles.textarea}
         />
-
         <Text style={styles.label}>Datum:</Text>
         <TextInput
           value={formData.dateTime}
           onChangeText={(text) => setFormData({ ...formData, dateTime: text })}
           style={styles.input}
         />
-
-        <Button title="Sighting toevoegen" onPress={handleAddSighting}/>
+        <Button title="Sighting toevoegen" onPress={handleAddSighting} />
       </View>
+    )}
     </View>
   );
 }
@@ -245,5 +252,19 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#ff6347',
     color: 'black'
+  },
+  toggleButton: {
+    position: 'absolute',
+    left: 10,
+    bottom: '50%',
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
+    zIndex: 1010,
   },
 });
