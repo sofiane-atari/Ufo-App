@@ -1,3 +1,4 @@
+"use dom"
 import React, { useState, useEffect } from 'react';
 import "leaflet/dist/leaflet.css";
 import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet';
@@ -5,6 +6,8 @@ import L from "leaflet";
 import axios from 'axios';
 import { View, StyleSheet, Text, TextInput, Button, TouchableOpacity } from 'react-native';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+
 
 interface UfoSighting {
   id: number;
@@ -16,6 +19,7 @@ interface UfoSighting {
   description: string;
   status: string;
   dateTime: string;
+  picture?: string;
 }
 
 interface LatLng {
@@ -211,7 +215,19 @@ const Form = ({ formData, setFormData, handleAddSighting }: FormProps) => {
     </>
   );
 };
-
+const Camera = () => {
+  const [facing, setFacing] = useState<CameraType>('back');
+  function toggleCameraFacing() {
+    setFacing(current => (current === 'back' ? 'front' : 'back'));
+  }(
+  <CameraView>
+    <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
+            <Text style={styles.label}>Flip Camera</Text>
+          </TouchableOpacity>
+        </View>
+  </CameraView>
+);}
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
@@ -281,5 +297,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 5,
     color: 'red',
+  },
+  buttonContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: 'transparent',
+    margin: 64,
+  },
+  button: {
+    flex: 1,
+    alignSelf: 'flex-end',
+    alignItems: 'center',
   },
 });
