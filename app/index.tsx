@@ -192,6 +192,7 @@ export default function Index() {
           style={styles.input}
         />
         <Button title="Sighting toevoegen" onPress={handleAddSighting} />
+        <Text style={styles.warning}>Klik eerst op de gewenste locatie voordat je op toevoegen klikt!</Text>
       </View>
     )}
     </View>
@@ -266,5 +267,11 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
     zIndex: 1010,
+  },
+  warning: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    marginBottom: 5,
+    color: 'red',
   },
 });
