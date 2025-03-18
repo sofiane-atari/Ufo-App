@@ -1,12 +1,13 @@
 "use dom"
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import "leaflet/dist/leaflet.css";
 import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet';
 import L from "leaflet";
 import axios from 'axios';
-import { View, StyleSheet, Text, TextInput, Button, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, TextInput, Button, TouchableOpacity, Platform } from 'react-native';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { CameraView, CameraType, useCameraPermissions, Camera } from 'expo-camera';
+import { Image } from "expo-image";
 
 
 interface UfoSighting {
@@ -210,24 +211,78 @@ const Form = ({ formData, setFormData, handleAddSighting }: FormProps) => {
           />
           <Button title="Sighting toevoegen" onPress={handleAddSighting} />
           <Text style={styles.warning}>Klik eerst op de gewenste locatie voordat je op toevoegen klikt!</Text>
+        {//<CameraComponent></CameraComponent>
+        }
         </View>
       )}
     </>
   );
 };
-const Camera = () => {
+const CameraComponent = () => {
   const [facing, setFacing] = useState<CameraType>('back');
+  const [permission, requestPermission] = useCameraPermissions();
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const ref = useRef<CameraView>(null);
+  const [uri, setUri] = useState<string | null>(null);
+  useEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      setHasPermission(status === 'granted');
+    })();
+  }, []);
+  if(!permission)
+    {
+      return null
+    }
+  if(!permission.granted) {
+    return(
+    <View style={styles.buttonContainer}>
+      <Text style={styles.message}>geef ons toegang tot je camera</Text>
+      <Button
+          title="Toegang geven"
+          onPress={async () => {
+            const { status } = await Camera.requestCameraPermissionsAsync();
+            setHasPermission(status === 'granted');
+          }}
+        />
+    </View>
+    );
+  }
   function toggleCameraFacing() {
     setFacing(current => (current === 'back' ? 'front' : 'back'));
-  }(
-  <CameraView>
+  }
+  const takePicture = async () => {
+    const photodata = await ref.current?.takePictureAsync();
+    setUri(photodata?.uri || null);
+  };
+  const renderCamera = () => {
+  return(
+    <CameraView style={styles.camera}>
     <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-            <Text style={styles.label}>Flip Camera</Text>
+          <TouchableOpacity style={styles.button} onPress={takePicture}>
+            <Text style={styles.label}>Snap</Text>
           </TouchableOpacity>
-        </View>
-  </CameraView>
+    </View>
+    </CameraView>
 );}
+const renderPicture = () => {
+  return (
+    <View>
+      <Image
+        source={{ uri }}
+        contentFit="contain"
+        style={{ width: 300, aspectRatio: 1 }}
+      />
+      <Button onPress={() => setUri(null)} title="Neem een andere foto" />
+    </View>
+  );
+};
+return (
+  <View style={styles.cameracontainer}>
+    {uri ? renderPicture() : renderCamera()}
+  </View>
+);
+}
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
@@ -298,15 +353,27 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     color: 'red',
   },
+  cameracontainer:{
+    flex: 1,
+    justifyContent: 'center',
+  },
+  camera: {
+    flex:1,
+  },
   buttonContainer: {
     flex: 1,
     flexDirection: 'row',
     backgroundColor: 'transparent',
-    margin: 64,
+    marginTop: 128,
   },
   button: {
     flex: 1,
     alignSelf: 'flex-end',
     alignItems: 'center',
+    backgroundColor: 'purple',
+  },
+  message: {
+    textAlign: 'center',
+    paddingBottom: 10,
   },
 });
