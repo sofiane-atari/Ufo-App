@@ -13,12 +13,16 @@ import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "@/types";
 
 export default function Sightings() {
   const [sightings, setSightings] = useState<UfoSighting[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
   const fetchSightings = async () => {
     try {
@@ -102,16 +106,22 @@ export default function Sightings() {
         data={sightings}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <View style={styles.sightingItem}>
-            <Text style={styles.title}>{item.witnessName}</Text>
-            <Text style={styles.description}>{item.description}</Text>
-            <View style={styles.imageContainer}>
-              <Image source={{ uri: item.picture }} style={styles.image} />
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("SightingDetail", { sighting: item })
+            }
+          >
+            <View style={styles.sightingItem}>
+              <Text style={styles.title}>{item.witnessName}</Text>
+              <Text style={styles.description}>{item.description}</Text>
+              <View style={styles.imageContainer}>
+                <Image source={{ uri: item.picture }} style={styles.image} />
+              </View>
+              <Text style={styles.date}>Datum: {item.dateTime}</Text>
+              <Text style={styles.date}>Status: {item.status}</Text>
+              <Text style={styles.contact}>Contact: {item.witnessContact}</Text>
             </View>
-            <Text style={styles.date}>Datum: {item.dateTime}</Text>
-            <Text style={styles.date}>Status: {item.status}</Text>
-            <Text style={styles.contact}>Contact: {item.witnessContact}</Text>
-          </View>
+          </TouchableOpacity>
         )}
         refreshControl={
           <RefreshControl
