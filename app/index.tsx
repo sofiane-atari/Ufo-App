@@ -63,9 +63,7 @@ const iconX = L.icon({
 
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0"); // Declareer `day` één keer
   const month = String(date.getMonth() + 1).padStart(2, "0"); // Maanden zijn 0-geïndexeerd
   const year = date.getFullYear();
   return `${day}-${month}-${year}`;
