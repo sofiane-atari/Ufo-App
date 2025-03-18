@@ -5,11 +5,14 @@ import {
   FlatList,
   ActivityIndicator,
   RefreshControl,
+  TouchableOpacity,
 } from "react-native";
 import { UfoSighting } from "@/types";
 import styles from "../assets/itemStyles/styles";
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function Sightings() {
   const [sightings, setSightings] = useState<UfoSighting[]>([]);
@@ -17,17 +20,19 @@ export default function Sightings() {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  const fetchSightings = async (isRefreshing = false) => {
-    if (!isRefreshing) setLoading(true);
+  const fetchSightings = async () => {
     try {
-      const response = await axios.get(
-        "https://sampleapis.assimilate.be/ufo/sightings"
-      );
-      const data: UfoSighting[] = response.data;
-      setSightings(data);
-      setLoading(false);
+      const storedData = await AsyncStorage.getItem("ufoSightings");
+      if (storedData) {
+        const parsedData = JSON.parse(storedData);
+        setSightings(parsedData);
+      } else {
+        // If no data in storage, fetch from API
+        await fetchSightingsFromAPI();
+      }
+      console.log("Opgeslagen data:", JSON.stringify(storedData, null, 2));
     } catch (error) {
-      console.error("Fout bij het ophalen van UFO-zichtingen:", error);
+      console.error("Error loading sightings from storage:", error);
       setError("Er is iets misgegaan bij het laden van de zichtingen.");
     } finally {
       setLoading(false);
@@ -35,14 +40,43 @@ export default function Sightings() {
     }
   };
 
-  useEffect(() => {
+  const fetchSightingsFromAPI = async () => {
+    try {
+      const response = await axios.get(
+        "https://sampleapis.assimilate.be/ufo/sightings"
+      );
+      const data: UfoSighting[] = response.data;
+
+      // Store fetched data in AsyncStorage
+      await AsyncStorage.setItem("ufoSightings", JSON.stringify(data));
+
+      setSightings(data);
+    } catch (error) {
+      console.error("Error fetching sightings from API:", error);
+      setError("Er is iets misgegaan bij het laden van de zichtingen.");
+    }
+  };
+
+  // Refresh function
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
     fetchSightings();
   }, []);
 
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    fetchSightings(true);
+  // Use Effect for initial load
+  useEffect(() => {
+    fetchSightings(); // Data opnieuw ophalen
   }, []);
+
+  // Focus effect for when navigating to this screen
+  useFocusEffect(
+    useCallback(() => {
+      fetchSightings();
+      return () => {
+        // Cleanup if needed
+      };
+    }, [])
+  );
 
   if (loading) {
     return (
