@@ -67,18 +67,16 @@ export default function Sightings() {
     fetchSightings();
   }, []);
 
-  // Use Effect for initial load
+  // effect for initial load
   useEffect(() => {
-    fetchSightings(); // Data opnieuw ophalen
+    fetchSightings();
   }, []);
 
-  // Focus effect for when navigating to this screen
+  // When navigating to this screen
   useFocusEffect(
     useCallback(() => {
       fetchSightings();
-      return () => {
-        // Cleanup if needed
-      };
+      return () => {};
     }, [])
   );
 

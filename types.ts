@@ -13,8 +13,8 @@ export interface UfoSighting {
 }
 
 export type RootStackParamList = {
-  SightingsList: undefined; // Geen parameters voor de lijstpagina
-  SightingDetail: { sighting: UfoSighting }; // Parameters voor de detailpagina
+  SightingsList: undefined;
+  SightingDetail: { sighting: UfoSighting };
 };
 
 export interface LatLng {

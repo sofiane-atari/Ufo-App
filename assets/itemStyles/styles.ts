@@ -61,6 +61,18 @@ const styles = StyleSheet.create({
     color: "#007BFF",
     marginTop: 5,
   },
+  button: {
+    backgroundColor: "lightgreen", // Achtergrondkleur
+    paddingVertical: 10, // Verticale padding
+    paddingHorizontal: 20, // Horizontale padding
+    borderRadius: 5, // Afgeronde hoeken
+    marginTop: 20, // Marge boven de knop
+  },
+  buttonText: {
+    color: "white", // Tekstkleur
+    fontSize: 16, // Tekstgrootte
+    fontWeight: "bold", // Vetgedrukte tekst
+  },
 });
 
 export default styles;

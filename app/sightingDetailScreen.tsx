@@ -1,8 +1,16 @@
 import React from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Button,
+  TouchableOpacity,
+} from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import styles from "@/assets/itemStyles/styles";
 import { UfoSighting } from "@/types";
+import { useNavigation } from "expo-router";
 
 // Definieer de types voor je navigatie-stack
 type RootStackParamList = {
@@ -22,6 +30,7 @@ const SightingDetailScreen: React.FC<SightingDetailScreenProps> = ({
   route,
 }) => {
   const { sighting } = route.params;
+  const navigation = useNavigation();
 
   return (
     <View style={styles.sightingItem}>
@@ -33,6 +42,13 @@ const SightingDetailScreen: React.FC<SightingDetailScreenProps> = ({
       <Text style={styles.date}>Datum: {sighting.dateTime}</Text>
       <Text style={styles.date}>Status: {sighting.status}</Text>
       <Text style={styles.contact}>Contact: {sighting.witnessContact}</Text>
+
+      <TouchableOpacity
+        style={styles.button} // Stijl voor de knop
+        onPress={() => navigation.goBack()} // Navigatie-actie
+      >
+        <Text style={styles.buttonText}>Back to Sightings List</Text>
+      </TouchableOpacity>
     </View>
   );
 };
