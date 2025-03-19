@@ -16,7 +16,7 @@ export default function RootLayout() {
         }}
       />
       <Tabs.Screen
-        name="sightings"
+        name="sightingsStack"
         options={{
           title: "Sightings",
           tabBarIcon: ({ color, size }) => (
