@@ -211,8 +211,9 @@ const Form = ({ formData, setFormData, handleAddSighting }: FormProps) => {
           />
           <Button title="Sighting toevoegen" onPress={handleAddSighting} />
           <Text style={styles.warning}>Klik eerst op de gewenste locatie voordat je op toevoegen klikt!</Text>
-        {//<CameraComponent></CameraComponent>
-        }
+          {//<CameraComponent></CameraComponent>
+          }
+        
         </View>
       )}
     </>
