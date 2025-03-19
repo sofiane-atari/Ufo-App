@@ -28,6 +28,9 @@ import {
   Camera,
 } from "expo-camera";
 import { Image } from "expo-image";
+import DateTimePicker from 'react-datetime-picker'
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 interface UfoSighting {
   id: number;
@@ -40,6 +43,7 @@ interface UfoSighting {
   status: string;
   dateTime: string;
   picture?: string;
+  email?: string;
 }
 
 interface LatLng {
@@ -52,6 +56,7 @@ interface FormData {
   description: string;
   dateTime: string;
   selectedLatLng: LatLng | null;
+  email: string;
 }
 
 const iconX = L.icon({
@@ -95,25 +100,10 @@ export default function Index() {
     description: "",
     dateTime: "",
     selectedLatLng: null,
+    email: "",
   });
   const [tempMarker, setTempMarker] = useState<LatLng | null>(null);
 
-  // Gegevens ophalen
-  /*
-  const fetchSightings = async () => {
-    try {
-      const response = await axios.get(
-        "https://sampleapis.assimilate.be/ufo/sightings"
-      );
-      const data: UfoSighting[] = response.data;
-      setSightings(data);
-      setLoading(false);
-    } catch (error) {
-      console.error("Fout bij het ophalen van UFO-zichtingen:", error);
-      setError("Er is iets misgegaan bij het laden van de zichtingen.");
-      setLoading(false);
-    }
-  };*/
 
   const fetchSightings = async () => {
     try {
@@ -159,9 +149,9 @@ export default function Index() {
 
   // Sighting toevoegen
   const handleAddSighting = async () => {
-    const { witnessName, description, dateTime, selectedLatLng } = formData;
+    const { witnessName, description, dateTime, selectedLatLng, email } = formData;
 
-    if (!witnessName || !description || !dateTime || !selectedLatLng) {
+    if (!witnessName || !description || !dateTime || !selectedLatLng || !email) {
       alert("Vul alle velden in en selecteer een locatie.");
       return;
     }
@@ -176,6 +166,7 @@ export default function Index() {
       description: formData.description,
       status: "unconfirmed",
       dateTime: formData.dateTime,
+      email: formData.email
     };
 
     // Controleer of de sighting al bestaat
@@ -197,6 +188,7 @@ export default function Index() {
       description: "",
       dateTime: "",
       selectedLatLng: null,
+      email: "",
     });
     setTempMarker(null); // Verwijder de tijdelijke marker na toevoegen
   };
@@ -242,7 +234,6 @@ export default function Index() {
                   <strong>Datum:</strong> {formatDate(sighting.dateTime)}
                 </p>
               </div>
-              <Button title="See details"></Button>
             </Popup>
           </Marker>
         ))}
@@ -297,27 +288,27 @@ const Form = ({ formData, setFormData, handleAddSighting }: FormProps) => {
             style={styles.textarea}
           />
           <Text style={styles.label}>Datum:</Text>
+          <DatePicker
+            selected={formData.dateTime ? new Date(formData.dateTime) : null}
+            onChange={(date) => 
+            setFormData({...formData,  dateTime: date ? date.toISOString() : ""})
+          }
+          dateFormat="dd-MM-yyyy"
+          className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          <Text style={styles.label}>Contactgegevens:</Text>
           <TextInput
-            value={formData.dateTime}
+            value={formData.email}
             onChangeText={(text) =>
-              setFormData({ ...formData, dateTime: text })
+              setFormData({ ...formData, email: text })
             }
-            style={styles.input}
+            multiline
+            style={styles.textarea}
           />
           <Button title="Sighting toevoegen" onPress={handleAddSighting} />
-<<<<<<< HEAD
           <Text style={styles.warning}>Klik eerst op de gewenste locatie voordat je op toevoegen klikt!</Text>
           {//<CameraComponent></CameraComponent>
           }
-        
-=======
-          <Text style={styles.warning}>
-            Klik eerst op de gewenste locatie voordat je op toevoegen klikt!
-          </Text>
-          {
-            //<CameraComponent></CameraComponent>
-          }
->>>>>>> 376528c54a240c08b540e3a9279f074334c33021
         </View>
       )}
     </>
