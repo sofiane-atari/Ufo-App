@@ -340,9 +340,11 @@ const CameraComponent = () => {
     setFacing((current) => (current === "back" ? "front" : "back"));
   }
   const takePicture = async () => {
+    console.log(ref.current)
     if (ref.current) {
       try {
         const photo = await ref.current.takePictureAsync();
+        console.log(photo?.uri)
         if (photo) {
           setUri(photo.uri);
         } else {
@@ -363,7 +365,7 @@ const CameraComponent = () => {
 }
   const renderCamera = () => {
     return (
-      <CameraView style={styles.camera}>
+      <CameraView style={styles.camera} ref={ref}>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={takePicture}>
             <Text style={styles.label}>Snap</Text>
