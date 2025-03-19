@@ -18,6 +18,7 @@ import {
   Button,
   TouchableOpacity,
   Platform,
+  Alert,
 } from "react-native";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -299,7 +300,7 @@ const Form = ({ formData, setFormData, handleAddSighting }: FormProps) => {
             Klik eerst op de gewenste locatie voordat je op toevoegen klikt!
           </Text>
           {
-            //<CameraComponent></CameraComponent>
+            <CameraComponent></CameraComponent>
           }
         </View>
       )}
@@ -339,9 +340,27 @@ const CameraComponent = () => {
     setFacing((current) => (current === "back" ? "front" : "back"));
   }
   const takePicture = async () => {
-    const photodata = await ref.current?.takePictureAsync();
-    setUri(photodata?.uri || null);
+    if (ref.current) {
+      try {
+        const photo = await ref.current.takePictureAsync();
+        if (photo) {
+          setUri(photo.uri);
+        } else {
+          Alert.alert(
+            "Fout",
+            "Er is een fout opgetreden bij het maken van de foto."
+          );
+        }
+      }
+      catch (error) {
+        console.error("Fout bij het maken van de foto:", error);
+        Alert.alert(
+          "Fout",
+          "Er is een fout opgetreden bij het maken van de foto."
+        )
+      }
   };
+}
   const renderCamera = () => {
     return (
       <CameraView style={styles.camera}>

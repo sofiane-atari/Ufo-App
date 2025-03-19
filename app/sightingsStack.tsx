@@ -10,7 +10,7 @@ const SightingsStack = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="SightingsList" component={Sightings} />
-      <Stack.Screen name="SightingDetail" component={SightingDetailScreen} />
+      <Stack.Screen name="SightingDetail" component={SightingDetailScreen}/>
     </Stack.Navigator>
   );
 };
