@@ -117,9 +117,6 @@ export default function Sightings() {
               <View style={styles.imageContainer}>
                 <Image source={{ uri: item.picture }} style={styles.image} />
               </View>
-              <Text style={styles.date}>Datum: {item.dateTime}</Text>
-              <Text style={styles.date}>Status: {item.status}</Text>
-              <Text style={styles.contact}>Contact: {item.witnessContact}</Text>
             </View>
           </TouchableOpacity>
         )}

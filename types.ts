@@ -6,8 +6,8 @@ export interface UfoSighting {
     longitude: number;
   };
   description: string;
-  picture: string;
-  status: "confirmed" | "unconfirmed";
+  picture?: string;
+  status: string;
   dateTime: string;
   witnessContact: string;
 }
@@ -16,3 +16,16 @@ export type RootStackParamList = {
   SightingsList: undefined; // Geen parameters voor de lijstpagina
   SightingDetail: { sighting: UfoSighting }; // Parameters voor de detailpagina
 };
+
+export interface LatLng {
+  lat: number;
+  lng: number;
+}
+
+export interface FormData {
+  witnessName: string;
+  description: string;
+  dateTime: string;
+  selectedLatLng: LatLng | null;
+  witnessContact: string;
+}

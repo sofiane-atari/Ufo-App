@@ -28,36 +28,11 @@ import {
   Camera,
 } from "expo-camera";
 import { Image } from "expo-image";
-import DateTimePicker from 'react-datetime-picker'
+import DateTimePicker from "react-datetime-picker";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
-interface UfoSighting {
-  id: number;
-  witnessName: string;
-  location: {
-    latitude: number;
-    longitude: number;
-  };
-  description: string;
-  status: string;
-  dateTime: string;
-  picture?: string;
-  email?: string;
-}
-
-interface LatLng {
-  lat: number;
-  lng: number;
-}
-
-interface FormData {
-  witnessName: string;
-  description: string;
-  dateTime: string;
-  selectedLatLng: LatLng | null;
-  email: string;
-}
+import { UfoSighting, LatLng, FormData } from "@/types";
+import styles from "@/assets/itemStyles/indexStyles";
 
 const iconX = L.icon({
   iconUrl:
@@ -100,10 +75,9 @@ export default function Index() {
     description: "",
     dateTime: "",
     selectedLatLng: null,
-    email: "",
+    witnessContact: "",
   });
   const [tempMarker, setTempMarker] = useState<LatLng | null>(null);
-
 
   const fetchSightings = async () => {
     try {
@@ -149,9 +123,21 @@ export default function Index() {
 
   // Sighting toevoegen
   const handleAddSighting = async () => {
-    const { witnessName, description, dateTime, selectedLatLng, email } = formData;
+    const {
+      witnessName,
+      description,
+      dateTime,
+      selectedLatLng,
+      witnessContact,
+    } = formData;
 
-    if (!witnessName || !description || !dateTime || !selectedLatLng || !email) {
+    if (
+      !witnessName ||
+      !description ||
+      !dateTime ||
+      !selectedLatLng ||
+      !witnessContact
+    ) {
       alert("Vul alle velden in en selecteer een locatie.");
       return;
     }
@@ -166,7 +152,7 @@ export default function Index() {
       description: formData.description,
       status: "unconfirmed",
       dateTime: formData.dateTime,
-      email: formData.email
+      witnessContact: formData.witnessContact,
     };
 
     // Controleer of de sighting al bestaat
@@ -188,7 +174,7 @@ export default function Index() {
       description: "",
       dateTime: "",
       selectedLatLng: null,
-      email: "",
+      witnessContact: "",
     });
     setTempMarker(null); // Verwijder de tijdelijke marker na toevoegen
   };
@@ -290,24 +276,30 @@ const Form = ({ formData, setFormData, handleAddSighting }: FormProps) => {
           <Text style={styles.label}>Datum:</Text>
           <DatePicker
             selected={formData.dateTime ? new Date(formData.dateTime) : null}
-            onChange={(date) => 
-            setFormData({...formData,  dateTime: date ? date.toISOString() : ""})
-          }
-          dateFormat="dd-MM-yyyy"
-          className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            onChange={(date) =>
+              setFormData({
+                ...formData,
+                dateTime: date ? date.toISOString() : "",
+              })
+            }
+            dateFormat="dd-MM-yyyy"
+            className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
           <Text style={styles.label}>Contactgegevens:</Text>
           <TextInput
-            value={formData.email}
+            value={formData.witnessContact}
             onChangeText={(text) =>
-              setFormData({ ...formData, email: text })
+              setFormData({ ...formData, witnessContact: text })
             }
             multiline
             style={styles.textarea}
           />
           <Button title="Sighting toevoegen" onPress={handleAddSighting} />
-          <Text style={styles.warning}>Klik eerst op de gewenste locatie voordat je op toevoegen klikt!</Text>
-          {//<CameraComponent></CameraComponent>
+          <Text style={styles.warning}>
+            Klik eerst op de gewenste locatie voordat je op toevoegen klikt!
+          </Text>
+          {
+            //<CameraComponent></CameraComponent>
           }
         </View>
       )}
@@ -379,97 +371,3 @@ const CameraComponent = () => {
     </View>
   );
 };
-const styles = StyleSheet.create({
-  container: {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    bottom: 0,
-    right: 0,
-  },
-  map: {
-    flex: 1,
-  },
-  formContainer: {
-    position: "absolute",
-    bottom: 20,
-    left: 20,
-    backgroundColor: "#ffffff",
-    padding: 15,
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
-    borderWidth: 1,
-    zIndex: 1000,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "bold",
-    marginBottom: 5,
-    color: "#333",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
-    padding: 10,
-    marginBottom: 10,
-    color: "#000",
-    backgroundColor: "#f9f9f9",
-  },
-  textarea: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
-    padding: 10,
-    height: 80,
-    textAlignVertical: "top",
-    marginBottom: 10,
-  },
-  toggleButton: {
-    position: "absolute",
-    left: 10,
-    bottom: "50%",
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
-    zIndex: 1010,
-  },
-  warning: {
-    fontSize: 10,
-    fontWeight: "bold",
-    marginBottom: 5,
-    color: "red",
-  },
-  cameracontainer: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  camera: {
-    flex: 1,
-  },
-  buttonContainer: {
-    flex: 1,
-    flexDirection: "row",
-    backgroundColor: "transparent",
-    marginTop: 128,
-  },
-  button: {
-    flex: 1,
-    alignSelf: "flex-end",
-    alignItems: "center",
-    backgroundColor: "purple",
-  },
-  message: {
-    textAlign: "center",
-    paddingBottom: 10,
-  },
-});
